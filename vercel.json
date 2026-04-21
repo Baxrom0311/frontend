@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/v1/:path*",
-      "destination": "http://164.90.183.111:8000/api/v1/:path*"
+      "destination": "https://bronh.boos.uz/api/v1/:path*"
     }
   ]
 }

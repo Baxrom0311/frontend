@@ -1,7 +1,7 @@
 import axios, { AxiosError, type AxiosRequestConfig } from "axios";
 
 export const API_BASE_URL =
-  (import.meta.env.VITE_API_BASE_URL as string | undefined) || "http://164.90.183.111:8000/api/v1";
+  (import.meta.env.VITE_API_BASE_URL as string | undefined) || "https://bronh.boos.uz/api/v1";
 
 const TOKEN_KEY = "cdss.access_token";
 const REFRESH_KEY = "cdss.refresh_token";
