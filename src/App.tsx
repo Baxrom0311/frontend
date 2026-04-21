@@ -350,6 +350,12 @@ export default function App() {
   const modelSupport = explanation && isStructuredExplanation(explanation) ? explanation.model_support : null;
   const pendingReviews = history.filter((item) => !item.is_confirmed);
   const confirmedReviews = history.filter((item) => item.is_confirmed);
+  const endpointLabel = apiBaseUrl.replace(/^https?:\/\//, "");
+  const heroTags = [
+    user ? getOptionLabel(uiLanguage, "role", user.role) : t("section.account"),
+    patient ? patient.full_name : t("section.patientProfile"),
+    diagnosis ? diagnosis.predicted_condition : t("section.result"),
+  ];
 
   useEffect(() => {
     persistLanguage(uiLanguage);
@@ -731,11 +737,22 @@ export default function App() {
 
   return (
     <main className="page">
+      <div className="page-glow glow-a" />
+      <div className="page-glow glow-b" />
+      <div className="page-glow glow-c" />
+
       <section className="hero">
-        <div>
+        <div className="hero-copy">
           <p className="eyebrow">{t("app.project")}</p>
           <h1>{t("app.title")}</h1>
           <p className="lead">{t("app.lead")}</p>
+          <div className="hero-tags">
+            {heroTags.map((tag) => (
+              <span key={tag} className="hero-tag">
+                {tag}
+              </span>
+            ))}
+          </div>
         </div>
 
         <div className="hero-meta">
@@ -755,9 +772,9 @@ export default function App() {
       </section>
 
       <section className="status-bar">
-        <div>
+        <div className="status-copy">
           <span className="status-label">{t("status.label")}</span>
-          <p>{statusText}</p>
+          <p className="status-text">{statusText}</p>
         </div>
         <div className="status-actions">
           <div className="segmented language-switcher" aria-label={t("label.language")}>
@@ -774,13 +791,13 @@ export default function App() {
           </div>
           {user ? (
             <div className="user-chip">
-              <span>{user.full_name}</span>
+              <span className="user-chip-label">{user.full_name}</span>
               <button type="button" onClick={handleLogout}>
                 {t("action.logout")}
               </button>
             </div>
           ) : (
-            <code>{apiBaseUrl}</code>
+            <span className="endpoint-chip">{endpointLabel}</span>
           )}
         </div>
       </section>
@@ -793,10 +810,7 @@ export default function App() {
           {user ? (
             <section className="card sidebar-card">
               <div className="card-header">
-                <div>
-                  <h2>{t("section.workspace")}</h2>
-                  <p>{t("description.workspace")}</p>
-                </div>
+                <h2>{t("section.workspace")}</h2>
               </div>
               <div className="segmented workspace-tabs">
                 {availableTabs.map((tab) => (
@@ -921,10 +935,7 @@ export default function App() {
           {user && workspaceTab === "assessment" && !patient ? (
             <section className="card form-card">
               <div className="card-header">
-                <div>
-                  <h2>{t("section.patientProfile")}</h2>
-                  <p>{t("description.patientProfile")}</p>
-                </div>
+                <h2>{t("section.patientProfile")}</h2>
               </div>
 
               <form className="form-grid" onSubmit={handlePatientSubmit}>
@@ -1234,10 +1245,7 @@ export default function App() {
           {canReview && workspaceTab === "reviews" ? (
             <section className="card form-card">
               <div className="card-header">
-                <div>
-                  <h2>{t("section.reviewQueue")}</h2>
-                  <p>{t("description.reviewQueue")}</p>
-                </div>
+                <h2>{t("section.reviewQueue")}</h2>
                 <span className="pill">{pendingReviews.length}</span>
               </div>
 
@@ -1286,10 +1294,7 @@ export default function App() {
             <>
               <section className="card form-card">
                 <div className="card-header">
-                  <div>
-                    <h2>{t("section.adminStats")}</h2>
-                    <p>{t("description.adminOverview")}</p>
-                  </div>
+                  <h2>{t("section.adminStats")}</h2>
                 </div>
                 {adminLoading ? (
                   <p className="muted">{t("status.loading")}</p>
@@ -1329,10 +1334,7 @@ export default function App() {
 
               <section className="card form-card">
                 <div className="card-header">
-                  <div>
-                    <h2>{t("section.adminUsers")}</h2>
-                    <p>{t("description.adminUsers")}</p>
-                  </div>
+                  <h2>{t("section.adminUsers")}</h2>
                 </div>
 
                 {adminLoading ? (
@@ -1596,26 +1598,6 @@ export default function App() {
                     {t("label.rows")}: {modelMetadata.dataset_profile?.total_rows ?? "-"}
                   </li>
                   <li>
-                    {t("label.rowsChanged")}:{" "}
-                    {modelMetadata.cleaning_report?.rows_with_any_change ?? "-"}
-                  </li>
-                  <li>
-                    {t("label.fieldChanges")}:{" "}
-                    {modelMetadata.cleaning_report?.total_field_changes ?? "-"}
-                  </li>
-                  <li>
-                    {t("label.qualityWarnings")}:{" "}
-                    {modelMetadata.data_quality_report?.warnings.length ?? "-"}
-                  </li>
-                  <li>
-                    {t("label.explainLabels")}:{" "}
-                    {modelMetadata.explainability_report?.label_count ?? "-"}
-                  </li>
-                  <li>
-                    {t("label.duplicates")}:{" "}
-                    {modelMetadata.data_quality_report?.duplicate_rows ?? "-"}
-                  </li>
-                  <li>
                     {t("label.labels")}: {modelMetadata.dataset_profile?.total_labels ?? "-"}
                   </li>
                   <li>
@@ -1625,14 +1607,11 @@ export default function App() {
                     {t("label.test")}: {modelMetadata.metrics?.test_samples ?? "-"}
                   </li>
                   <li>
-                    {t("label.split")}: {modelMetadata.metrics?.split_source ?? "-"}
-                  </li>
-                  <li>
                     {t("label.cvFolds")}: {modelMetadata.evaluation_report?.folds ?? "-"}
                   </li>
                   <li>
-                    {t("label.classBalance")}:{" "}
-                    {modelMetadata.data_quality_report?.class_balance_ratio ?? "-"}
+                    {t("label.qualityWarnings")}:{" "}
+                    {modelMetadata.data_quality_report?.warnings.length ?? "-"}
                   </li>
                   <li>
                     {t("label.holdoutAccuracy")}:{" "}
@@ -1691,33 +1670,6 @@ export default function App() {
             ) : (
               <p className="muted">{t("description.noResults")}</p>
             )}
-          </section>
-
-          <section className="card sidebar-card">
-            <h2>{t("section.apiNotes")}</h2>
-            <ul className="text-list compact">
-              <li>
-                <code>/auth/register</code> + <code>/auth/login</code> {t("description.apiAuth")}
-              </li>
-              <li>
-                <code>/patients/</code> {t("description.apiPatient")}
-              </li>
-              <li>
-                <code>/symptoms/</code> + <code>/diagnoses/</code> {t("description.apiFlow")}
-              </li>
-              <li>
-                <code>/health/model-metadata</code> {t("description.apiMetadata")}
-              </li>
-              <li>
-                <code>/diagnoses/{"{id}"}/confirm</code> {t("description.apiConfirm")}
-              </li>
-              <li>
-                <code>/admin/stats</code> + <code>/admin/users</code> {t("description.apiAdmin")}
-              </li>
-              <li>
-                <code>/admin/ml/retrain</code> {t("description.apiRetrain")}
-              </li>
-            </ul>
           </section>
         </aside>
       </section>
