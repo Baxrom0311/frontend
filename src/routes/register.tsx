@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAuth } from "@/lib/auth-store";
-import { getApiErrorMessage, type LanguageCode, type UserRole } from "@/lib/api";
+import { getApiErrorMessage, type LanguageCode } from "@/lib/api";
 
 export const Route = createFileRoute("/register")({
   component: RegisterPage,
@@ -31,7 +31,6 @@ function RegisterPage() {
     email: "",
     password: "",
     full_name: "",
-    role: "patient" as UserRole,
     preferred_language: (i18n.language as LanguageCode) || "uz",
   });
   const [loading, setLoading] = useState(false);
@@ -40,7 +39,7 @@ function RegisterPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await register(form);
+      await register({ ...form, role: "patient" });
       await login(form.email, form.password);
       toast.success(t("auth.welcome"));
       navigate({ to: "/app" });
@@ -107,23 +106,7 @@ function RegisterPage() {
                 className="rounded-xl bg-background/40"
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label>{t("auth.role")}</Label>
-                <Select
-                  value={form.role}
-                  onValueChange={(v) => setForm({ ...form, role: v as UserRole })}
-                >
-                  <SelectTrigger className="rounded-xl bg-background/40">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="patient">{t("roles.patient")}</SelectItem>
-                    <SelectItem value="doctor">{t("roles.doctor")}</SelectItem>
-                    <SelectItem value="admin">{t("roles.admin")}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="grid gap-3">
               <div className="space-y-1.5">
                 <Label>{t("auth.preferredLanguage")}</Label>
                 <Select
